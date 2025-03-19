@@ -35,18 +35,33 @@ class LoginController extends GetxController {
     });
 
     if (response.statusCode == 200) {
-      authToken.write('token', response.body['token']);
-      Get.offAll(() => const DashboardView());
+      // Ambil token dari 'access_token'
+      final token = response.body['access_token'];
+      if (token != null) {
+        // Simpan token di GetStorage
+        GetStorage().write('token', token);
+        print(" Token berhasil disimpan: $token");
+
+        // Pindah ke Dashboard
+        Get.offAll(() => const DashboardView());
+      } else {
+        Get.snackbar(
+          'Error',
+          'Token tidak ditemukan di respons!',
+          icon: const Icon(Icons.error),
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } else {
       Get.snackbar(
         'Error',
-        response.body['error'].toString(),
+        response.body['message'] ?? 'Login gagal',
         icon: const Icon(Icons.error),
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        forwardAnimationCurve: Curves.bounceIn,
-        margin: const EdgeInsets.only(),
       );
     }
   }
+
 }
