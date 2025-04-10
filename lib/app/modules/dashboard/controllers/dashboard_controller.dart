@@ -10,6 +10,7 @@ class DashboardController extends GetxController {
   var selectedIndex = 0.obs;
   var isLoading = false.obs;
   final kanbanResponse = Rxn<KanbanResponse>();
+  
 
   void changeIndex(int index) {
     selectedIndex.value = index;

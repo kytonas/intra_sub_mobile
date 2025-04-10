@@ -55,57 +55,57 @@ class BoardView extends GetView<DashboardController> {
             );
           }
 
-          return ListView.builder(
-            itemCount: tasks.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
+              return ListView.builder(
+                itemCount: tasks.length,
+                controller: scrollController,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final task = tasks[index];
 
-              return Card(
-                margin: const EdgeInsets.only(bottom: 16),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.name ?? 'No Title',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        task.content ?? 'No Content',
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Chip(
-                            label: Text("ID: ${task.id}"),
-                            backgroundColor: Colors.blue.shade100,
-                          ),
                           Text(
-                            "Status: ${task.statusId}",
+                            task.name ?? 'No Title',
                             style: const TextStyle(
-                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                        Text(
+                            task.content ?? 'No Content',
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Chip(
+                                label: Text("ID: ${task.id}"),
+                                backgroundColor: Colors.blue.shade100,
+                              ),
+                              Text(
+                                "Status: ${task.status?.name ?? 'Unknown'}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
-            },
-          );
         }),
       ),
     );
