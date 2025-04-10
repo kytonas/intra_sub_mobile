@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 import '../controllers/login_controller.dart';
@@ -18,14 +18,10 @@ class LoginView extends GetView<LoginController> {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 70.0),
-              child: Text(
-                'Intra-sub',
-                style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                  ),
-                ),
+              child: Image.asset(
+                'assets/images/intra-sublogo.jpeg',
+                width: 200,
+                height: 200,
               ),
             ),
             Padding(
