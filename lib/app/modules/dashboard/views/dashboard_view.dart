@@ -32,11 +32,15 @@ class DashboardView extends GetView<DashboardController> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
               label: 'Board',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'Profile',
+              label: 'Profil',
             ),
           ],
         ),

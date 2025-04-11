@@ -11,6 +11,12 @@ class LoginController extends GetxController {
   TextEditingController passwordController = TextEditingController();
   final authToken = GetStorage();
 
+  var isPasswordHidden = true.obs;
+
+  void togglePasswordVisibility() {
+    isPasswordHidden.value = !isPasswordHidden.value;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -63,5 +69,4 @@ class LoginController extends GetxController {
       );
     }
   }
-
 }
