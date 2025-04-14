@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:intra_sub_mobile/app/data/kanban_response.dart';
 import 'package:intra_sub_mobile/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:intra_sub_mobile/app/modules/kanban/views/kanban_view.dart';
 import 'package:lottie/lottie.dart';
 
 class BoardView extends GetView<DashboardController> {
@@ -9,18 +10,18 @@ class BoardView extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    // Pastikan controller sudah diinisialisasi
     final controller = Get.find<DashboardController>();
     final ScrollController scrollController = ScrollController();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Board'),
+        title: const Text('Project List'),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => controller.getTask(),
+            onPressed: () =>
+                controller.getProjects(), // Ganti ini sesuai method-mu
           ),
         ],
       ),
@@ -29,25 +30,32 @@ class BoardView extends GetView<DashboardController> {
         child: Obx(() {
           if (controller.isLoading.value) {
             return Center(
-              child: Lottie.network(
-                'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                repeat: true,
-                width: MediaQuery.of(context).size.width / 1,
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text("Loading animation failed");
+                  },
+                ),
               ),
             );
           }
 
-          final tasks = controller.kanbanResponse.value?.tasks;
+          final projects = controller.projectResponse.value?.projects;
 
-          if (tasks == null || tasks.isEmpty) {
+          if (projects == null || projects.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Tidak ada data task"),
+                  const Text("Tidak ada data project"),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => controller.getTask(),
+                    onPressed: () => controller.getProjects(),
                     child: const Text("Refresh"),
                   ),
                 ],
@@ -55,57 +63,67 @@ class BoardView extends GetView<DashboardController> {
             );
           }
 
-              return ListView.builder(
-                itemCount: tasks.length,
-                controller: scrollController,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  final task = tasks[index];
+          return ListView.builder(
+            itemCount: projects.length,
+            controller: scrollController,
+            itemBuilder: (context, index) {
+              final project = projects[index];
 
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            task.name ?? 'No Title',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                        Text(
-                            task.content ?? 'No Content',
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Chip(
-                                label: Text("ID: ${task.id}"),
-                                backgroundColor: Colors.blue.shade100,
-                              ),
-                              Text(
-                                "Status: ${task.status?.name ?? 'Unknown'}",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => const KanbanView(), arguments: project.id);
                 },
+                child: Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          project.name ?? 'No Title',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          project.description ?? 'No Description',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Chip(
+                              label: Text("ID: ${project.id}"),
+                              backgroundColor: Colors.blue.shade100,
+                            ),
+                            Text(
+                              "Status: ${project.status?.name ?? 'Unknown'}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (project.owner != null)
+                          Text(
+                            "Owner: ${project.owner!.name ?? 'No Name'}",
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               );
+
+            },
+          );
         }),
       ),
     );

@@ -1,6 +1,7 @@
 class BaseUrl {
-  static String login = 'http://192.168.51.188:8000/api/login';
-  static String logout = 'http://192.168.51.188:8000/api/logout';
-  static String profile = 'http://192.168.51.188:8000/api/user';
-  static String task = 'http://192.168.51.188:8000/api/task';
+  static String login = 'http://192.168.0.73:8000/api/login';
+  static String logout = 'http://192.168.0.73:8000/api/logout';
+  static String profile = 'http://192.168.0.73:8000/api/user';
+  static String task = 'http://192.168.0.73:8000/api/task';
+  static String project = 'http://192.168.0.73:8000/api/project';
 }
