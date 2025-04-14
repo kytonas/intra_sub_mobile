@@ -8,6 +8,16 @@ import 'package:lottie/lottie.dart';
 class BoardView extends GetView<DashboardController> {
   const BoardView({Key? key}) : super(key: key);
 
+  // Function to remove HTML tags from text
+  String stripHtmlTags(String? htmlString) {
+    if (htmlString == null || htmlString.isEmpty) {
+      return 'No Description';
+    }
+    // Remove HTML tags with a RegExp
+    final RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+    return htmlString.replaceAll(exp, '');
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DashboardController>();
