@@ -1,15 +1,37 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intra_sub_mobile/app/data/kanban_response.dart';
+import 'package:intra_sub_mobile/app/data/taskstatus_response.dart';
 import 'package:intra_sub_mobile/app/utils/api.dart';
 
 class KanbanController extends GetxController {
-  //TODO: Implement KanbanController
   final box = GetStorage();
   final _getConnect = GetConnect();
   final token = GetStorage().read('token');
+
   final isLoading = false.obs;
   final kanbanResponse = Rxn<KanbanResponse>();
+  final taskStatuses = <Taskstatus>[].obs;
+
+  Future<void> getTaskStatuses() async {
+    try {
+      final response = await _getConnect.get(
+        BaseUrl.taskstatus,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.status.hasError) {
+        throw Exception(response.statusText);
+      }
+
+      final result = TaskStatusResponse.fromJson(response.body);
+      if (result.taskstatus != null) {
+        taskStatuses.assignAll(result.taskstatus!);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Gagal memuat status: $e");
+    }
+  }
 
   Future<KanbanResponse?> getTask([int? projectId]) async {
     isLoading.value = true;
@@ -41,19 +63,75 @@ class KanbanController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    getTask();
+  Map<String, List<Task>> groupTasksByStatus(List<Task> tasks) {
+    final grouped = <String, List<Task>>{
+      for (var status in taskStatuses) status.name ?? 'Unknown': [],
+    };
+
+    for (var task in tasks) {
+      final statusName = task.status?.name ?? 'Unknown';
+
+      if (!grouped.containsKey(statusName)) {
+        grouped[statusName] = [];
+      }
+
+      grouped[statusName]!.add(task);
+    }
+
+    return grouped;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
+  Future<void> updateTaskStatus({
+    required int taskId,
+    required int newStatusId,
+    required String newStatusName,
+    required String newStatusColor,
+  }) async {
+    try {
+      final taskList = kanbanResponse.value?.tasks;
+      final index = taskList?.indexWhere((t) => t.id == taskId);
+      if (index != null && index >= 0) {
+        taskList![index!] = taskList[index!].copyWith(
+          statusId: newStatusId,
+          status: Status(
+              id: newStatusId, name: newStatusName, color: newStatusColor),
+        );
+        kanbanResponse.refresh();
+      }
 
-  @override
-  void onClose() {
-    super.onClose();
+      await _getConnect.put(
+        "${BaseUrl.task}/$taskId",
+        {
+          "status_id": newStatusId,
+        },
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Gagal update status task: $e");
+    }
+  }
+}
+
+extension TaskCopy on Task {
+  Task copyWith({
+    int? statusId,
+    Status? status,
+  }) {
+    return Task(
+      id: id,
+      name: name,
+      content: content,
+      ownerId: ownerId,
+      responsibleId: responsibleId,
+      statusId: statusId ?? this.statusId,
+      status: status ?? this.status,
+      projectId: projectId,
+      typeId: typeId,
+      priorityId: priorityId,
+      startDate: startDate,
+      endDate: endDate,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
   }
 }
